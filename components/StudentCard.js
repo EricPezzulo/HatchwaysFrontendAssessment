@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { StudentContext, TagContext } from "../contexts/StudentContext";
 const StudentCard = ({
   firstName,
   lastName,
@@ -11,14 +12,29 @@ const StudentCard = ({
   id,
   grades,
   email,
+  student,
+  tags,
+  filteredTags,
 }) => {
   const [openGrades, setOpenGrades] = useState(false);
-
+  const [tagName, setTagName] = useState("");
+  const [listOfTags, setListOfTags] = useState([]);
   const average = grades.map(Number).reduce((a, b) => a + b) / grades.length;
 
-  const handleClick = () => {
+  const { studentData, setStudentData } = useContext(StudentContext);
+
+  const handleOpenGrades = () => {
     setOpenGrades(!openGrades);
   };
+
+  const handleSubmitTag = (e) => {
+    if (e.key === "Enter") {
+      tags.push(tagName);
+      setListOfTags([...listOfTags, tagName]);
+      setTagName("");
+    }
+  };
+
   return (
     <div className="flex w-full h-full items-center justify-between flex-row border-b border-1 border-gray-300 py-6 font-Raleway">
       <div className="flex">
@@ -37,7 +53,7 @@ const StudentCard = ({
           </div>
           <div className="ml-4 leading-7">
             <div>
-              <p>Email:{email}</p>
+              <p>Email: {email}</p>
             </div>
             <div>
               <p>Company: {company}</p>
@@ -46,30 +62,48 @@ const StudentCard = ({
               <p>Skill: {skill}</p>
             </div>{" "}
             <div>
-              <p>
-                Average:
-                {average.toFixed(2)}%
-              </p>
+              <p>Average: {average.toFixed(2)}%</p>
             </div>
           </div>
           {openGrades && (
             <div className="ml-4">
               {grades.map((grade, index) => (
-                <p>
+                <p key={index}>
                   Test {index + 1}: {grade}%
                 </p>
               ))}
             </div>
           )}
-        </div>{" "}
-      </div>{" "}
+          <div className="ml-4">
+            <div className="flex flex-row">
+              {tags.map((tag, key) => {
+                return (
+                  <div key={key} className="flex mr-1">
+                    <div className="flex bg-gray-400 rounded-md text-white px-2 py-1">
+                      {tag}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <input
+              className="outline-none border-b-2 focus:border-b-black duration-300"
+              type="text"
+              placeholder="Add a tag"
+              onChange={(e) => setTagName(e.target.value)}
+              value={tagName}
+              onKeyDown={handleSubmitTag}
+            />
+          </div>
+        </div>
+      </div>
       <div className="flex h-full relative right-10 top-5">
         {openGrades && (
           <RemoveIcon
             fontSize="large"
             color="action"
             className="hover:cursor-pointer"
-            onClick={handleClick}
+            onClick={handleOpenGrades}
           />
         )}
         {!openGrades && (
@@ -77,7 +111,7 @@ const StudentCard = ({
             fontSize="large"
             color="action"
             className="hover:cursor-pointer"
-            onClick={handleClick}
+            onClick={handleOpenGrades}
           />
         )}
       </div>
