@@ -6,22 +6,16 @@ const StudentCard = ({
   firstName,
   lastName,
   company,
-  city,
   pic,
   skill,
-  id,
   grades,
   email,
-  student,
   tags,
-  filteredTags,
 }) => {
   const [openGrades, setOpenGrades] = useState(false);
   const [tagName, setTagName] = useState("");
   const [listOfTags, setListOfTags] = useState([]);
   const average = grades.map(Number).reduce((a, b) => a + b) / grades.length;
-
-  const { studentData, setStudentData } = useContext(StudentContext);
 
   const handleOpenGrades = () => {
     setOpenGrades(!openGrades);
@@ -34,7 +28,6 @@ const StudentCard = ({
       setTagName("");
     }
   };
-
   return (
     <div className="flex w-full h-full items-center justify-between flex-row border-b border-1 border-gray-300 py-6 font-Raleway">
       <div className="flex">

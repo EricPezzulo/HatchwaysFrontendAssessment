@@ -1,16 +1,12 @@
 import Head from "next/head";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import StudentCard from "../components/StudentCard";
-import axios from "axios";
 import { StudentContext } from "../contexts/StudentContext";
 
 export default function Home() {
-  const API_URL = "https://api.hatchways.io/assessment/students";
-  const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [tagTerm, setTagTerm] = useState("");
   const { studentData, setStudentData } = useContext(StudentContext);
-
   const editSearchTerm = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -18,16 +14,28 @@ export default function Home() {
     setTagTerm(e.target.value);
   };
 
-  // const filteredTags = studentData.filter((student) => {
-  //   return student.tags.map((item) =>
-  //     item.toLowerCase().includes(tagTerm.toLowerCase())
-  //   );
-  // });
-
   const filteredResults = studentData.filter((student) => {
     const name = student.firstName + " " + student.lastName;
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
+    const nameIncludesSearchTerm = name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const tagsIncludesTagTerm = student.tags
+      .map((t) => t.toLowerCase())
+      .includes(tagTerm.toLowerCase());
+    const includesNameAndTag = nameIncludesSearchTerm && tagsIncludesTagTerm;
+    const includeNameOrTag = nameIncludesSearchTerm || tagsIncludesTagTerm;
+    return includesNameAndTag || includeNameOrTag;
   });
+
+  // const filteredResults = studentData.filter((student) => {
+  //   const name = student.firstName + " " + student.lastName;
+  //   return (
+  //     name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     student.tags.filter((tag) => {
+  //       return tag.toLowerCase().includes(tagTerm.toLowerCase());
+  //     })
+  //   );
+  // });
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-100 ">
       <Head>
