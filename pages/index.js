@@ -6,7 +6,7 @@ import { StudentContext } from "../contexts/StudentContext";
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [tagTerm, setTagTerm] = useState("");
-  const { studentData, setStudentData } = useContext(StudentContext);
+  const { studentData } = useContext(StudentContext);
   const editSearchTerm = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -14,28 +14,12 @@ export default function Home() {
     setTagTerm(e.target.value);
   };
 
-  const filteredResults = studentData.filter((student) => {
-    const name = student.firstName + " " + student.lastName;
-    const nameIncludesSearchTerm = name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const tagsIncludesTagTerm = student.tags
-      .map((t) => t.toLowerCase())
-      .includes(tagTerm.toLowerCase());
-    const includesNameAndTag = nameIncludesSearchTerm && tagsIncludesTagTerm;
-    const includeNameOrTag = nameIncludesSearchTerm || tagsIncludesTagTerm;
-    return includesNameAndTag || includeNameOrTag;
-  });
+  const result = studentData.filter(({ firstName, lastName, tags }) =>
+    new RegExp(searchTerm || tagTerm, "gui").test(
+      `${firstName} ${lastName} ${tags.join(" ")}`
+    )
+  );
 
-  // const filteredResults = studentData.filter((student) => {
-  //   const name = student.firstName + " " + student.lastName;
-  //   return (
-  //     name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     student.tags.filter((tag) => {
-  //       return tag.toLowerCase().includes(tagTerm.toLowerCase());
-  //     })
-  //   );
-  // });
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-100 ">
       <Head>
@@ -48,8 +32,8 @@ export default function Home() {
       </Head>
       <div className="flex flex-col w-full h-full">
         <div className="flex w-3/4 items-center self-center">
-          <div className="flex rounded-lg flex-col overflow-y-scroll w-full h-studentContainer border border-gray-300 bg-white">
-            <div className="flex flex-col bg-white rounded-lg ">
+          <div className="flex rounded-lg flex-col overflow-auto w-full h-studentContainer border border-gray-300 bg-white scrollbar-hide">
+            <div className="flex flex-col bg-white rounded-xl">
               <input
                 className="text-gray-400 text-lg p-4 outline-none border-b-2 border-gray-300 mx-2 focus:border-black duration-300"
                 placeholder="Search by name"
@@ -62,7 +46,7 @@ export default function Home() {
                 onChange={editTagTerm}
                 value={tagTerm}
               />
-              {filteredResults.map((student, key) => {
+              {result.map((student, key) => {
                 return (
                   <div key={key} className="flex flex-col w-full">
                     <StudentCard
